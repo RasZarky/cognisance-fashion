@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="120" viewBox="0 0 400 120">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1">
+      <stop offset="0" stop-color="#6d28d9" />
+      <stop offset="1" stop-color="#ec4899" />
+    </linearGradient>
+  </defs>
+  <rect width="400" height="120" rx="16" fill="transparent" />
+  <g transform="translate(24,12)">
+    <circle cx="44" cy="44" r="36" fill="url(#g)" />
+    <text x="100" y="56" font-family="Inter, Roboto, Arial, sans-serif" font-size="28" fill="#2b0750">Cognisance</text>
+    <text x="100" y="86" font-family="Inter, Roboto, Arial, sans-serif" font-size="14" fill="#6b21a8">Fashion</text>
+  </g>
+</svg>
