@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ShoppingCart } from 'lucide-react';
 import { Toaster } from 'sonner';
 import Hero from './components/Hero';
 import About from './components/About';
@@ -15,12 +15,19 @@ import PageLoader from './components/PageLoader';
 import Login from './components/Login';
 import NavAccount from './components/NavAccount';
 import MemberShop from './components/MemberShop';
+import ProductDetail from './components/ProductDetail';
+import Cart from './components/Cart';
+import Orders from './components/Orders';
 import { useAuth } from './context/AuthContext';
+import { useCart } from './context/CartContext';
 
 export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [showCart, setShowCart] = useState(false);
+  const [showOrders, setShowOrders] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -39,6 +46,8 @@ export default function App() {
   };
 
   const { loggedIn } = useAuth();
+  const { cart } = useCart();
+  const cartItemCount = cart?.reduce((total, item) => total + (item?.quantity || 0), 0) || 0;
 
   return (
     <>
@@ -92,21 +101,58 @@ export default function App() {
                   </motion.button>
                 ))}
                 {/* Account / Logout only shown when logged in */}
-                {loggedIn && <NavAccount scrollToSection={scrollToSection} />}
+                {loggedIn && (
+                  <NavAccount
+                    scrollToSection={scrollToSection}
+                    onAction={() => setShowOrders(true)}
+                  />
+                )}
+                {loggedIn && (
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    onClick={() => setShowCart(true)}
+                    className="relative p-2"
+                    aria-label="Shopping cart"
+                  >
+                    <ShoppingCart className="w-6 h-6 text-purple-900" />
+                    {cartItemCount > 0 && (
+                      <span className="absolute -top-2 -right-2 min-w-5 h-5 bg-pink-600 text-white rounded-full text-xs flex items-center justify-center font-bold px-1">
+                        {cartItemCount}
+                      </span>
+                    )}
+                  </motion.button>
+                )}
               </div>
 
               {/* Mobile Menu Button */}
-              <button
-                className="md:hidden p-2"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                aria-label="Toggle menu"
-              >
-                {mobileMenuOpen ? (
-                  <X className="w-6 h-6 text-purple-900" />
-                ) : (
-                  <Menu className="w-6 h-6 text-purple-900" />
+              <div className="md:hidden flex items-center gap-4">
+                {loggedIn && (
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    onClick={() => setShowCart(true)}
+                    className="relative p-2"
+                    aria-label="Shopping cart"
+                  >
+                    <ShoppingCart className="w-6 h-6 text-purple-900" />
+                    {cartItemCount > 0 && (
+                      <span className="absolute -top-2 -right-2 min-w-5 h-5 bg-pink-600 text-white rounded-full text-xs flex items-center justify-center font-bold px-1">
+                        {cartItemCount}
+                      </span>
+                    )}
+                  </motion.button>
                 )}
-              </button>
+                <button
+                  className="p-2"
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  aria-label="Toggle menu"
+                >
+                  {mobileMenuOpen ? (
+                    <X className="w-6 h-6 text-purple-900" />
+                  ) : (
+                    <Menu className="w-6 h-6 text-purple-900" />
+                  )}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -130,7 +176,14 @@ export default function App() {
                 ))}
                 {loggedIn && (
                   <div className="pt-4 border-t border-white/20">
-                    <NavAccount scrollToSection={scrollToSection} onAction={() => setMobileMenuOpen(false)} isMobile />
+                    <NavAccount
+                      scrollToSection={scrollToSection}
+                      onAction={() => {
+                        setMobileMenuOpen(false);
+                        setShowOrders(true);
+                      }}
+                      isMobile
+                    />
                   </div>
                 )}
               </div>
@@ -140,21 +193,32 @@ export default function App() {
 
         {/* Main Content */}
         <main className="pt-20">
-          {loggedIn ? (
-            <MemberShop />
-          ) : (
-            <>
-              <Hero scrollToSection={scrollToSection} />
-              <About />
-              <Services />
-              <Login />
-              <ProductShowcase />
-              <Gallery />
-              <Testimonials />
-              <Contact />
-      
-            </>
-          )}
+          <AnimatePresence mode="wait">
+            {showOrders ? (
+              <Orders key="orders" onBack={() => setShowOrders(false)} />
+            ) : showCart ? (
+              <Cart key="cart" onBack={() => setShowCart(false)} />
+            ) : selectedProduct ? (
+              <ProductDetail
+                key={`product-${selectedProduct.id}`}
+                product={selectedProduct}
+                onBack={() => setSelectedProduct(null)}
+              />
+            ) : loggedIn ? (
+              <MemberShop key="member-shop" onSelectProduct={setSelectedProduct} />
+            ) : (
+              <div key="landing">
+                <Hero scrollToSection={scrollToSection} />
+                <About />
+                <Services />
+                <Login />
+                <ProductShowcase onSelectProduct={setSelectedProduct} />
+                <Gallery />
+                <Testimonials />
+                <Contact />
+              </div>
+            )}
+          </AnimatePresence>
         </main>
 
         <Footer />

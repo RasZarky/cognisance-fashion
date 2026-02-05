@@ -14,7 +14,7 @@ export default function NavAccount({ scrollToSection, onAction, isMobile }: NavA
     return (
       <div className={`flex gap-4 ${isMobile ? 'flex-col items-stretch' : 'items-center'}`}>
         <button
-          onClick={() => { scrollToSection('member-shop'); onAction?.(); }}
+          onClick={() => { onAction?.(); }}
           className={`text-purple-900/80 hover:text-purple-900 transition-colors capitalize ${isMobile ? 'w-full text-center py-3 rounded-xl bg-white/60' : ''}`}
         >
           Account

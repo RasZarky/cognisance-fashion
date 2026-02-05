@@ -13,7 +13,11 @@ interface Product {
   image: string;
 }
 
-export default function MemberShop() {
+interface MemberShopProps {
+  onSelectProduct?: (product: Product) => void;
+}
+
+export default function MemberShop({ onSelectProduct }: MemberShopProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.1 });
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -73,7 +77,7 @@ export default function MemberShop() {
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {filtered.map(product => (
-            <div key={product.id} className="backdrop-blur-xl bg-white/60 rounded-3xl overflow-hidden border border-white/60 shadow-xl p-4">
+            <div key={product.id} className="backdrop-blur-xl bg-white/60 rounded-3xl overflow-hidden border border-white/60 shadow-xl p-4 cursor-pointer hover:shadow-2xl transition-shadow" onClick={() => onSelectProduct?.(product)}>
               <div className="relative h-64 overflow-hidden rounded-2xl mb-4">
                 <ImageWithFallback src={product.image} alt={product.name} className="w-full h-full object-cover" />
               </div>

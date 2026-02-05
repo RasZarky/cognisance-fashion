@@ -4,6 +4,7 @@ import { useRef, useState } from 'react';
 import { ShoppingCart, Eye } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'sonner';
 
 interface Product {
   id: number;
@@ -13,7 +14,11 @@ interface Product {
   image: string;
 }
 
-export default function ProductShowcase() {
+interface ProductShowcaseProps {
+  onSelectProduct?: (product: Product) => void;
+}
+
+export default function ProductShowcase({ onSelectProduct }: ProductShowcaseProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.1 });
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -80,6 +85,16 @@ export default function ProductShowcase() {
   const { loggedIn } = useAuth();
   const displayedProducts = loggedIn ? filteredProducts : filteredProducts.slice(0, 3);
 
+  const handleBuyClick = () => {
+    if (!loggedIn) {
+      const element = document.getElementById('login');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+      toast.info('Please login to view product details and add to cart');
+    }
+  };
+
   return (
     <section id="shop" ref={ref} className="py-20 lg:py-32 bg-gradient-to-b from-transparent via-purple-50/30 to-transparent relative overflow-hidden">
       {/* Background Elements */}
@@ -143,10 +158,25 @@ export default function ProductShowcase() {
                   
                   {/* Overlay on Hover */}
                   <div className="absolute inset-0 bg-gradient-to-t from-purple-900/80 via-purple-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
-                    <button className="p-3 bg-white/90 rounded-full hover:bg-white transition-colors" aria-label="Quick view">
+                    <button
+                      onClick={() => loggedIn && onSelectProduct?.(product)}
+                      className="p-3 bg-white/90 rounded-full hover:bg-white transition-colors"
+                      aria-label="View details"
+                      disabled={!loggedIn}
+                    >
                       <Eye className="w-5 h-5 text-purple-900" />
                     </button>
-                    <button className="p-3 bg-white/90 rounded-full hover:bg-white transition-colors" aria-label="Add to cart">
+                    <button
+                      onClick={() => {
+                        if (loggedIn) {
+                          onSelectProduct?.(product);
+                        } else {
+                          handleBuyClick();
+                        }
+                      }}
+                      className="p-3 bg-white/90 rounded-full hover:bg-white transition-colors"
+                      aria-label="Add to cart"
+                    >
                       <ShoppingCart className="w-5 h-5 text-purple-900" />
                     </button>
                   </div>
@@ -157,8 +187,17 @@ export default function ProductShowcase() {
                   <h3 className="text-xl text-purple-950 mb-2">{product.name}</h3>
                   <div className="flex items-center justify-between">
                     <span className="text-2xl text-purple-900">GH₵{product.price.toLocaleString('en-GH')}</span>
-                    <button className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full text-sm hover:shadow-lg transition-all duration-300 hover:scale-105">
-                      Enquire
+                    <button
+                      onClick={() => {
+                        if (loggedIn) {
+                          onSelectProduct?.(product);
+                        } else {
+                          handleBuyClick();
+                        }
+                      }}
+                      className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full text-sm hover:shadow-lg transition-all duration-300 hover:scale-105"
+                    >
+                      {loggedIn ? 'View' : 'Login to Buy'}
                     </button>
                   </div>
                 </div>
