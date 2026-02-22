@@ -1,10 +1,7 @@
 import { motion } from 'motion/react';
 import { useInView } from 'motion/react';
 import { useRef, useState } from 'react';
-import { ShoppingCart, Eye } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { useAuth } from '../context/AuthContext';
-import { toast } from 'sonner';
 
 interface Product {
   id: number;
@@ -14,14 +11,14 @@ interface Product {
   image: string;
 }
 
-interface ProductShowcaseProps {
-  onSelectProduct?: (product: Product) => void;
-}
-
-export default function ProductShowcase({ onSelectProduct }: ProductShowcaseProps) {
+export default function ProductShowcase() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.1 });
   const [selectedCategory, setSelectedCategory] = useState('all');
+
+  const handleProductClick = () => {
+    window.location.href = 'https://cognisance-fashion-shop.web.app/';
+  };
 
   const products: Product[] = [
     {
@@ -80,21 +77,6 @@ export default function ProductShowcase({ onSelectProduct }: ProductShowcaseProp
     ? products 
     : products.filter(p => p.category === selectedCategory);
 
-  // Show full list only for logged-in users
-  // Guests see a limited preview of the first 3 items and are prompted to login
-  const { loggedIn } = useAuth();
-  const displayedProducts = loggedIn ? filteredProducts : filteredProducts.slice(0, 3);
-
-  const handleBuyClick = () => {
-    if (!loggedIn) {
-      const element = document.getElementById('login');
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-      }
-      toast.info('Please login to view product details and add to cart');
-    }
-  };
-
   return (
     <section id="shop" ref={ref} className="py-20 lg:py-32 bg-gradient-to-b from-transparent via-purple-50/30 to-transparent relative overflow-hidden">
       {/* Background Elements */}
@@ -138,7 +120,7 @@ export default function ProductShowcase({ onSelectProduct }: ProductShowcaseProp
 
         {/* Product Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {displayedProducts.map((product, index) => (
+          {filteredProducts.map((product, index) => (
             <motion.div
               key={product.id}
               initial={{ opacity: 0, y: 30 }}
@@ -147,7 +129,7 @@ export default function ProductShowcase({ onSelectProduct }: ProductShowcaseProp
               className="group relative"
             >
               {/* Product Card */}
-              <div className="backdrop-blur-xl bg-white/60 rounded-3xl overflow-hidden border border-white/60 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+              <div onClick={handleProductClick} className="cursor-pointer backdrop-blur-xl bg-white/60 rounded-3xl overflow-hidden border border-white/60 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
                 {/* Image Container */}
                 <div className="relative h-80 overflow-hidden">
                   <ImageWithFallback
@@ -155,31 +137,6 @@ export default function ProductShowcase({ onSelectProduct }: ProductShowcaseProp
                     alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
-                  
-                  {/* Overlay on Hover */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-purple-900/80 via-purple-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
-                    <button
-                      onClick={() => loggedIn && onSelectProduct?.(product)}
-                      className="p-3 bg-white/90 rounded-full hover:bg-white transition-colors"
-                      aria-label="View details"
-                      disabled={!loggedIn}
-                    >
-                      <Eye className="w-5 h-5 text-purple-900" />
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (loggedIn) {
-                          onSelectProduct?.(product);
-                        } else {
-                          handleBuyClick();
-                        }
-                      }}
-                      className="p-3 bg-white/90 rounded-full hover:bg-white transition-colors"
-                      aria-label="Add to cart"
-                    >
-                      <ShoppingCart className="w-5 h-5 text-purple-900" />
-                    </button>
-                  </div>
                 </div>
 
                 {/* Product Info */}
@@ -187,18 +144,6 @@ export default function ProductShowcase({ onSelectProduct }: ProductShowcaseProp
                   <h3 className="text-xl text-purple-950 mb-2">{product.name}</h3>
                   <div className="flex items-center justify-between">
                     <span className="text-2xl text-purple-900">GH₵{product.price.toLocaleString('en-GH')}</span>
-                    <button
-                      onClick={() => {
-                        if (loggedIn) {
-                          onSelectProduct?.(product);
-                        } else {
-                          handleBuyClick();
-                        }
-                      }}
-                      className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full text-sm hover:shadow-lg transition-all duration-300 hover:scale-105"
-                    >
-                      {loggedIn ? 'View' : 'Login to Buy'}
-                    </button>
                   </div>
                 </div>
               </div>
@@ -208,27 +153,6 @@ export default function ProductShowcase({ onSelectProduct }: ProductShowcaseProp
             </motion.div>
           ))}
         </div>
-
-        {/* Login prompt for guests */}
-        {!loggedIn && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.8 }}
-            className="mt-12 text-center"
-          >
-            <div className="max-w-xl mx-auto backdrop-blur-xl bg-white/60 rounded-3xl p-8 border border-white/60 shadow-xl">
-              <h3 className="text-xl text-purple-950 mb-2">Login to view our full collection</h3>
-              <p className="text-purple-800/70 mb-4">Members get access to exclusive listings and pricing.</p>
-              <button
-                onClick={() => { const el = document.getElementById('login'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }}
-                className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full hover:shadow-lg transition-all duration-300"
-              >
-                Login
-              </button>
-            </div>
-          </motion.div>
-        )}
 
         {/* Payment Integration Note */}
         <motion.div

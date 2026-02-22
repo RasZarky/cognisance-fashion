@@ -1,8 +1,0 @@
-flutter:
-  # This section identifies your Flutter project location.
-  # This is used by the flutter tool to generate files in the build/ directory
-  # and plugins - see `flutter pub get` and `flutter pub upgrade` for details.
-  
-  # The following line ensures that the Material Icons font is included with your application,
-  # so that you can use the icons in the Material Icons class.
-  uses-material-design: true
