@@ -4,6 +4,8 @@ import { useRef } from 'react';
 import { Award, Heart, Users } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
+const seamstressImg = new URL('../assets/seamstreess.jpg', import.meta.url).href;
+
 export default function About() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
@@ -43,9 +45,9 @@ export default function About() {
           >
             <div className="relative rounded-3xl overflow-hidden shadow-2xl backdrop-blur-xl bg-white/40 border border-white/60 p-2">
               <ImageWithFallback
-                src="https://images.unsplash.com/photo-1758171692659-024183c2c272?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBmYXNoaW9uJTIwZGVzaWduZXIlMjB3b3JraW5nfGVufDF8fHx8MTc3MDIyODM2N3ww&ixlib=rb-4.1.0&q=80&w=1080"
+                src={seamstressImg}
                 alt="Fashion Designer"
-                className="w-full h-[500px] object-cover rounded-2xl"
+                className="w-full h-auto rounded-2xl"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-purple-900/30 to-transparent rounded-2xl" />
             </div>
