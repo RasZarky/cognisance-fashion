@@ -154,19 +154,28 @@ export default function ProductShowcase() {
           ))}
         </div>
 
-        {/* Payment Integration Note */}
+       
+        {/* View More Button */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.8 }}
-          className="mt-16 text-center backdrop-blur-xl bg-white/60 rounded-3xl p-8 border border-white/60 shadow-xl max-w-3xl mx-auto"
+          transition={{ duration: 0.6, delay: 1 }}
+          className="mt-20 pt-8 text-center"
         >
-          <p className="text-purple-800/80 mb-4">
-            Love what you see? Get in touch to place your order or schedule a custom consultation.
-          </p>
-          <p className="text-sm text-purple-700/60">
-            Secure payment options available via Mobile Money (MTN/Vodafone), Paystack & Stripe
-          </p>
+          <button
+            onClick={() => window.open('https://cognisance-fashion-shop.web.app/', '_blank')}
+            className="group relative px-8 py-3 rounded-lg font-semibold text-base text-white transition-all duration-300 hover:scale-105 hover:shadow-2xl shadow-lg"
+            style={{
+              background: 'linear-gradient(135deg, #9333ea 0%, #ec4899 100%)',
+            }}
+          >
+            <span className="relative z-10 flex items-center justify-center gap-2">
+              View More Collections
+              <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </span>
+          </button>
         </motion.div>
       </div>
     </section>
